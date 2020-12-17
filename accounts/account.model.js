@@ -23,6 +23,14 @@ const schema = new Schema({
     type: String,
     required: true
   },
+  phone: {
+    type: String,
+    required: true
+  },
+  specialty: {
+    type: String,
+    required: true
+  },
   acceptTerms: Boolean,
   role: {
     type: String,

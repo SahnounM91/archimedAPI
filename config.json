@@ -1,13 +1,13 @@
 ﻿{
-    "connectionString": "mongodb://127.0.0.1:27017/archimed_2",
-    "secret": "THIS IS USED TO SIGN AND VERIFY JWT TOKENS, REPLACE IT WITH YOUR OWN SECRET, IT CAN BE ANY STRING",
+    "connectionString": "mongodb://127.0.0.1:27017/archimed",
+    "secret": "archimedsecretkey",
     "emailFrom": "info@archimed.com",
     "smtpOptions": {
         "host": "smtp.mailtrap.io",
         "port": 2525,
         "auth": {
-            "user": "9e3e26e2e783cb",
-            "pass": "6e56d1d222c2a7"
+            "user": "d20ebb1e2f33f7",
+            "pass": "f2e99e02a56c53"
         }
     }
 }
