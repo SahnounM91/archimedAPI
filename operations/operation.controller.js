@@ -16,12 +16,6 @@ router.delete('/:id', authorize(), _delete);
 module.exports = router;
 
 
-function resetPassword(req, res, next) {
-    accountService.resetPassword(req.body)
-        .then(() => res.json({ message: 'Password reset successful, you can now login' }))
-        .catch(next);
-}
-
 function getAll(req, res, next) {
     accountService.getAll()
         .then(accounts => res.json(accounts))
@@ -47,7 +41,10 @@ function createSchema(req, res, next) {
         email: Joi.string().email().required(),
         password: Joi.string().min(6).required(),
         confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
-        role: Joi.string().valid(Role.Admin, Role.User).required()
+        role: Joi.string().valid(Role.Admin, Role.User).required(),
+        phone: Joi.string().regex(/^\D*(\d\D*){8,13}$/).required(),
+        specialty: Joi.string().required(),
+        region: Joi.string().required(),
     });
     validateRequest(req, next, schema);
 }
@@ -65,7 +62,10 @@ function updateSchema(req, res, next) {
         lastName: Joi.string().empty(''),
         email: Joi.string().email().empty(''),
         password: Joi.string().min(6).empty(''),
-        confirmPassword: Joi.string().valid(Joi.ref('password')).empty('')
+        confirmPassword: Joi.string().valid(Joi.ref('password')).empty(''),
+        phone: Joi.string().regex(/^\D*(\d\D*){8,13}$/).empty(''),
+        specialty: Joi.string().empty(''),
+        region: Joi.string().empty(''),
     };
 
     // only admins can update role

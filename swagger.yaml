@@ -220,6 +220,15 @@ paths:
                 confirmPassword:
                   type: string
                   example: "pass123"
+                phone:
+                  type: string
+                  example: "+21622662266"
+                specialty:
+                  type: string
+                  example: "specialty example"
+                region:
+                  type: string
+                  example: Sousse
                 acceptTerms:
                   type: boolean
               required:
@@ -229,6 +238,9 @@ paths:
                 - email
                 - password
                 - confirmPassword
+                - region
+                - phone
+                - specialty
                 - acceptTerms
       responses:
         "200":
