@@ -31,7 +31,21 @@ const schema = new Schema({
     type: String,
     required: true
   },
+
+  region: {
+    type: String,
+    required: true
+  },
   acceptTerms: Boolean,
+
+  subscriptionPeriod:{
+    type: Number,
+    default: 6
+  },
+  payed:{
+    type:Boolean,
+    default: true
+  },
   role: {
     type: String,
     required: true
@@ -42,7 +56,13 @@ const schema = new Schema({
     token: String,
     expires: Date
   },
+
   passwordReset: Date,
+
+  operations: [{
+    type: Schema.Types.ObjectID,
+    ref: "Operation"
+  }],
   created: {
     type: Date,
     default: Date.now
