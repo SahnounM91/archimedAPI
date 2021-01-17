@@ -253,13 +253,15 @@ function randomTokenString() {
 }
 
 function basicDetails(account) {
-    const {id, title, firstName, lastName, email, role, created, updated, isVerified} = account;
-    return {id, title, firstName, lastName, email, role, created, updated, isVerified};
+    console.log(account)
+    const {id, title, firstName, lastName, email,specialty, region, role, created, updated, isVerified} = account;
+    return {id, title, firstName, lastName, email,specialty, region, role, created, updated, isVerified};
 }
 
 async function sendVerificationEmail(account, origin) {
     let message;
     if (origin) {
+        console.log(origin)
         const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
         message = `<p>Please click the below link to verify your email address:</p>
                    <p><a href="${verifyUrl}">${verifyUrl}</a></p>`;

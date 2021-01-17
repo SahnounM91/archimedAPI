@@ -15,12 +15,17 @@ app.use(cors({ origin: (origin, callback) => callback(null, true), credentials: 
 
 // api routes
 app.use('/accounts', require('./accounts/accounts.controller'));
+app.use('/operations', require('./operations/operation.controller'));
+
 
 // swagger docs route
 app.use('/api-docs', require('_helpers/swagger'));
 
 // global error handler
 app.use(errorHandler);
+
+
+global.__basedir = __dirname;
 
 // start server
 const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;

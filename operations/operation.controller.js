@@ -1,101 +1,65 @@
 const express = require('express');
+const fs = require('fs');
+const unzipper = require('unzipper');
 const router = express.Router();
 const Joi = require('joi');
 const validateRequest = require('_middleware/validate-request');
 const authorize = require('_middleware/authorize')
 const Role = require('_helpers/role');
-const accountService = require('./account.service');
+const operationService = require('./operation.service');
+const uploadFile = require("_middleware/upload");
 
 // routes
-router.get('/', authorize(Role.Admin), getAll);
+router.post('/upload', authorize(), upload);
+/*
 router.get('/:id', authorize(), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
 router.put('/:id', authorize(), updateSchema, update);
 router.delete('/:id', authorize(), _delete);
-
+*/
 module.exports = router;
 
+function upload(req, res) {
 
-function getAll(req, res, next) {
-    accountService.getAll()
-        .then(accounts => res.json(accounts))
-        .catch(next);
+    uploadFile(req, res).then(data => {
+            console.log(req.zipFilePath)
+            fs.createReadStream(req.zipFilePath)
+                .pipe(unzipper.Extract({path: __basedir + "/resources/static/assets/unzipped"}))
+                .on('close', function (entry) {
+                    console.log("fuck us", entry)
+                    fs.readdir(__basedir + "/resources/static/assets/unzipped", (err, files) => {
+                        files.forEach(file => {
+                            console.log(file);
+                        });
+                        fs.unlink(req.zipFilePath, function (e) {
+                            if (e) throw e;
+                            console.log('successfully deleted ' + req.zipFilePath);
+                        });
+                        return res.status(200).send({
+                            message: "Uploaded the file successfully: " + req.file.originalname,
+                        });
+                    });
+                });
+        }
+    ).catch(err => {
+        console.log(err.message)
+        return res.status(500).send({
+            message: `Could not upload the file, ${err.message}`,
+        });
+    })
 }
 
-function getById(req, res, next) {
-    // users can get their own account and admins can get any account
-    if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
 
-    accountService.getById(req.params.id)
-        .then(account => account ? res.json(account) : res.sendStatus(404))
-        .catch(next);
-}
-
-function createSchema(req, res, next) {
-    const schema = Joi.object({
-        title: Joi.string().required(),
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().min(6).required(),
-        confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
-        role: Joi.string().valid(Role.Admin, Role.User).required(),
-        phone: Joi.string().regex(/^\D*(\d\D*){8,13}$/).required(),
-        specialty: Joi.string().required(),
-        region: Joi.string().required(),
-    });
-    validateRequest(req, next, schema);
-}
-
-function create(req, res, next) {
-    accountService.create(req.body)
-        .then(account => res.json(account))
-        .catch(next);
-}
-
-function updateSchema(req, res, next) {
-    const schemaRules = {
-        title: Joi.string().empty(''),
-        firstName: Joi.string().empty(''),
-        lastName: Joi.string().empty(''),
-        email: Joi.string().email().empty(''),
-        password: Joi.string().min(6).empty(''),
-        confirmPassword: Joi.string().valid(Joi.ref('password')).empty(''),
-        phone: Joi.string().regex(/^\D*(\d\D*){8,13}$/).empty(''),
-        specialty: Joi.string().empty(''),
-        region: Joi.string().empty(''),
-    };
-
-    // only admins can update role
-    if (req.user.role === Role.Admin) {
-        schemaRules.role = Joi.string().valid(Role.Admin, Role.User).empty('');
-    }
-
-    const schema = Joi.object(schemaRules).with('password', 'confirmPassword');
-    validateRequest(req, next, schema);
-}
+/*
 
 function update(req, res, next) {
     // users can update their own account and admins can update any account
     if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({message: 'Unauthorized'});
     }
 
     accountService.update(req.params.id, req.body)
         .then(account => res.json(account))
-        .catch(next);
-}
-
-function _delete(req, res, next) {
-    // users can delete their own account and admins can delete any account
-    if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    accountService.delete(req.params.id)
-        .then(() => res.json({ message: 'Account deleted successfully' }))
         .catch(next);
 }
 
@@ -105,7 +69,8 @@ function setTokenCookie(res, token) {
     // create cookie with refresh token that expires in 7 days
     const cookieOptions = {
         httpOnly: true,
-        expires: new Date(Date.now() + 7*24*60*60*1000)
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     };
     res.cookie('refreshToken', token, cookieOptions);
 }
+*/
