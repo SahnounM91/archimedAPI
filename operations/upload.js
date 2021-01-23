@@ -7,7 +7,6 @@ let storage = multer.diskStorage({
         cb(null, __basedir + "/resources/static/assets/uploads/zip");
     },
     filename: (req, file, cb) => {
-        console.log(__basedir + "/resources/static/assets/uploads/zip/" + file.originalname );
         req.zipFilePath = __basedir + "/resources/static/assets/uploads/zip/" + file.originalname
         cb(null, file.originalname);
     },

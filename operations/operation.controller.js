@@ -6,11 +6,12 @@ const Joi = require('joi');
 const validateRequest = require('_middleware/validate-request');
 const authorize = require('_middleware/authorize')
 const Role = require('_helpers/role');
-const operationService = require('./operation.service');
-const uploadFile = require("_middleware/upload");
+const accountService = require('../accounts/account.service');
+const uploadFile = require("operations/upload");
+const db = require('_helpers/db');
 
 // routes
-router.post('/upload', authorize(), upload);
+router.post('/upload',authorize(Role.User), upload);
 /*
 router.get('/:id', authorize(), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
@@ -19,21 +20,15 @@ router.delete('/:id', authorize(), _delete);
 */
 module.exports = router;
 
-function upload(req, res) {
-
+async function upload(req, res) {
     uploadFile(req, res).then(data => {
-            console.log(req.zipFilePath)
             fs.createReadStream(req.zipFilePath)
                 .pipe(unzipper.Extract({path: __basedir + "/resources/static/assets/unzipped"}))
                 .on('close', function (entry) {
-                    console.log("fuck us", entry)
                     fs.readdir(__basedir + "/resources/static/assets/unzipped", (err, files) => {
-                        files.forEach(file => {
-                            console.log(file);
-                        });
+
                         fs.unlink(req.zipFilePath, function (e) {
                             if (e) throw e;
-                            console.log('successfully deleted ' + req.zipFilePath);
                         });
                         return res.status(200).send({
                             message: "Uploaded the file successfully: " + req.file.originalname,
@@ -42,7 +37,6 @@ function upload(req, res) {
                 });
         }
     ).catch(err => {
-        console.log(err.message)
         return res.status(500).send({
             message: `Could not upload the file, ${err.message}`,
         });
