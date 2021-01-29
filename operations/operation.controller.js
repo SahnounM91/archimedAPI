@@ -11,7 +11,7 @@ const uploadFile = require("operations/upload");
 const db = require('_helpers/db');
 
 // routes
-router.post('/upload',authorize(Role.User), upload);
+router.post('/upload', upload);
 /*
 router.get('/:id', authorize(), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
