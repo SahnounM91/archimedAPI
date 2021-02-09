@@ -1,48 +1,69 @@
-const express = require('express');
-const fs = require('fs');
-const unzipper = require('unzipper');
-const router = express.Router();
-const Joi = require('joi');
-const validateRequest = require('_middleware/validate-request');
+const express = require('express')
+const fs = require('fs')
+const unzipper = require('unzipper')
+const Joi = require('joi')
+
+const router = express.Router()
+const validateRequest = require('_middleware/validate-request')
 const authorize = require('_middleware/authorize')
-const Role = require('_helpers/role');
-const accountService = require('../accounts/account.service');
-const uploadFile = require("operations/upload");
-const db = require('_helpers/db');
+const Role = require('_helpers/role')
+const uploadFile = require("operations/upload")
+const db = require('_helpers/db')
+const extractDir = '/resources/files/unzipped/'
+const moment = require('moment-timezone')
 
 // routes
-router.post('/upload', upload);
-/*
-router.get('/:id', authorize(), getById);
-router.post('/', authorize(Role.Admin), createSchema, create);
-router.put('/:id', authorize(), updateSchema, update);
-router.delete('/:id', authorize(), _delete);
-*/
+router.post('/upload', authorize(Role.User), upload);
 module.exports = router;
 
-async function upload(req, res) {
-    uploadFile(req, res).then(data => {
-            fs.createReadStream(req.zipFilePath)
-                .pipe(unzipper.Extract({path: __basedir + "/resources/static/assets/unzipped"}))
-                .on('close', function (entry) {
-                    fs.readdir(__basedir + "/resources/static/assets/unzipped", (err, files) => {
 
-                        fs.unlink(req.zipFilePath, function (e) {
-                            if (e) throw e;
-                        });
-                        return res.status(200).send({
-                            message: "Uploaded the file successfully: " + req.file.originalname,
-                        });
-                    });
-                });
-        }
-    ).catch(err => {
+
+async function upload(req, res) {
+    uploadFile(req, res)
+        .then(data => {
+            extract(req, res)
+        }).catch(err => {
+        console.log(err)
         return res.status(500).send({
-            message: `Could not upload the file, ${err.message}`,
+            message: `Could not upload the file, ${err}`,
         });
     })
 }
 
+async function extract(req, res) {
+    let uploadDate = getFormattedDate()
+    let account = await getAccount(req.user.id)
+    let userDirectory = global.__basedir + extractDir + account.fullName + account.shortUid + "/";
+    fs.createReadStream(req.zipFilePath)
+        .pipe(unzipper.Extract({path: userDirectory + uploadDate}))
+        .on('close', function (entry) {
+            fs.readdir(global.__basedir + extractDir + userDirectory + req.zipName, (err, files) => {
+                fs.unlink(req.zipFilePath, function (e) {
+                    if (e) throw e;
+                });
+                return res.status(200).send({
+                    message: "Uploaded the file successfully: " + req.file.originalname,
+                });
+            });
+        });
+}
+
+// helper functions
+
+async function getAccount(id) {
+    if (!db.isValidId(id)) throw 'Account not found';
+    const account = await db.Account.findById(id);
+    if (!account) throw 'Account not found';
+    return account;
+}
+
+function getFormattedDate() {
+    let uploadDate = new Date().toISOString();
+    moment.tz(uploadDate, "Africa/Tunis")
+    uploadDate = moment(uploadDate).format("YYYY-MM-DD HH:mm:ss")
+    uploadDate = uploadDate.replace(/\s/g, 'T')
+    return uploadDate
+}
 
 /*
 

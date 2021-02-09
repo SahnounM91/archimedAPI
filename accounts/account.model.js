@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+const nanoid =  require('nanoid')
 const schema = new Schema({
+  shortUid:{
+    type:String,
+    unique: true
+  },
   email: {
     type: String,
     unique: true,
@@ -72,6 +76,15 @@ const schema = new Schema({
 
 schema.virtual('isVerified').get(function() {
   return !!(this.verified || this.passwordReset);
+});
+
+schema.virtual('fullName').get(function() {
+  return (this.lastName + this.firstName).replace(/\s/g, '')
+});
+
+schema.pre('save', function(next) {
+  this.shortUid = nanoid.nanoid(10)
+  next();
 });
 
 schema.set('toJSON', {
