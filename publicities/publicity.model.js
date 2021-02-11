@@ -5,17 +5,18 @@ const schema = new Schema({
     description: {
         type: String,
     },
-    image:{
+    image: {
         type: String,
-        required: true
     },
-
+    isActive: {
+        type: Boolean,
+        default: false
+    }
 });
 
 schema.set('toJSON', {
     virtuals: true,
     versionKey: false,
-
 });
 
 module.exports = mongoose.model('Publicity', schema);

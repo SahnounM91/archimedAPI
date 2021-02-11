@@ -7,7 +7,7 @@ const router = express.Router()
 const validateRequest = require('_middleware/validate-request')
 const authorize = require('_middleware/authorize')
 const Role = require('_helpers/role')
-const uploadFile = require("operations/upload")
+const uploadFile = require("./upload")
 const db = require('_helpers/db')
 const extractDir = '/resources/files/unzipped/'
 const moment = require('moment-timezone')
@@ -23,7 +23,6 @@ async function upload(req, res) {
         .then(data => {
             extract(req, res)
         }).catch(err => {
-        console.log(err)
         return res.status(500).send({
             message: `Could not upload the file, ${err}`,
         });
