@@ -9,7 +9,7 @@ const authorize = require('_middleware/authorize')
 const Role = require('_helpers/role')
 const uploadFile = require("./upload")
 const db = require('_helpers/db')
-const extractDir = '/resources/files/unzipped/'
+const extractDir = '/privateResources/files/unzipped/'
 const moment = require('moment-timezone')
 
 // routes

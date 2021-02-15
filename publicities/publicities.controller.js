@@ -9,7 +9,7 @@ const Role = require('_helpers/role');
 const publicityService = require('./publicity.service');
 const multer = require("multer");
 
-const uploadDir = '/resources/pubs'
+const uploadDir = '/privateResources/pubs'
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         fs.exists(global.__basedir + uploadDir, exists => {

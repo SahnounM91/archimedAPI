@@ -17,6 +17,8 @@ app.use(cors({ origin: (origin, callback) => callback(null, true), credentials: 
 app.use('/accounts', require('./accounts/accounts.controller'));
 app.use('/operations', require('./operations/operation.controller'));
 app.use('/publicities', require('./publicities/publicities.controller'));
+app.use('/advertising', require('./advertisings/advertising.controller'));
+
 
 
 
@@ -25,8 +27,8 @@ app.use('/api-docs', require('_helpers/swagger'));
 
 // global error handler
 app.use(errorHandler);
-
-
+app.use(express.static('public'));
+app.use('/public', express.static(__dirname + '/public'));
 global.__basedir = __dirname;
 
 // start server
