@@ -1,13 +1,13 @@
 ﻿{
-    "connectionString": "mongodb://127.0.0.1:27017/archimed",
+    "connectionString": "mongodb://medbox-tn.com:27017/archimed",
     "secret": "archimedsecretkey",
-    "emailFrom": "info@archimed.com",
+    "emailFrom": "info@medbox-tn.com",
     "smtpOptions": {
-        "host": "smtp.mailtrap.io",
-        "port": 2525,
+        "host": "smtp.gmail.com",
+        "port": 587,
         "auth": {
-            "user": "d20ebb1e2f33f7",
-            "pass": "f2e99e02a56c53"
+            "user": "archimedrn@gmail.com",
+            "pass": "uxiuhynceasblohj"
         }
     }
 }
